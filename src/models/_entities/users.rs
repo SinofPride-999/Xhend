@@ -17,6 +17,7 @@ pub struct Model {
     #[sea_orm(unique)]
     pub api_key: String,
     pub name: String,
+    pub profile_picture: Option<String>,
     pub reset_token: Option<String>,
     pub reset_sent_at: Option<DateTimeWithTimeZone>,
     pub email_verification_token: Option<String>,
@@ -27,4 +28,21 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(has_many = "super::transfers::Entity")]
+    Transfers,
+    #[sea_orm(has_many = "super::transfer_history::Entity")]
+    TransferHistory,
+}
+
+impl Related<super::transfers::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Transfers.def()
+    }
+}
+
+impl Related<super::transfer_history::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::TransferHistory.def()
+    }
+}
